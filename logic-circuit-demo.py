@@ -123,7 +123,7 @@ cprint.cfg('b', 'k', 'b')
 #    print(sample, csp.check(sample), energy)
 
 
-print("Starting Packing Into CSV")
+
 valid, invalid, datas = 0, 0, []
 for datum in sampleset.data(['sample', 'energy', 'num_occurrences']):
     if (csp.check(datum.sample)):
@@ -134,7 +134,7 @@ for datum in sampleset.data(['sample', 'energy', 'num_occurrences']):
         invalid = invalid+datum.num_occurrences
         for i in range(datum.num_occurrences):
             datas.append((datum.sample, datum.energy, '0'))
-print(valid, invalid)
+print("valid,invalid",valid, invalid)
 print(datas)
 print(datas[0][0])
 data=sampleset
