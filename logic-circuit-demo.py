@@ -16,6 +16,8 @@ from dwave.system import DWaveSampler, EmbeddingComposite
 from TextFormatter import TextFormatter
 from datetime import datetime
 import time
+import array as arr
+
 
 
 print("Quantum Solver Engine")
@@ -23,6 +25,15 @@ print("Copyright (c) 2021 naru fox")
 print("All Rights Reserved\n\n")
 print("Staring Program...")
 import dwavebinarycsp
+
+print("Defining vars")
+
+varNames=['a', 'b', 'y', 'z']
+
+outNames=['a','b','y','z']
+samplesize=10
+
+
 
 print("defining binToDec")
 def binToDec(inNum):
@@ -34,13 +45,21 @@ def binToDec(inNum):
 
 print("Defining Logic Circuit")
 
-def logic_circuit(a,b,c,d,e,f,g):
-    str1=str(a)+str(b)+str(c)+str(d)+str(f)+str(g)
-    num1=binToDec(str1)
-    num2=num1*num1
-    output1=num2==49
-    
-    return (output1)
+#old circuit
+#    str1=str(a)+str(b)+str(c)+str(d)+str(f)+str(g)
+#    num1=binToDec(str1)
+#    num2=num1*num1
+#    output1=num2==49
+#  
+def logic_circuit(a,b,y,z):
+    and1=a and b
+    or1=a or b
+    not1=not and1
+    and2=not1 and or1
+    out1=and2
+    carry1=and1
+
+    return ((out1==y) and (carry1==z))
 print("Setting up custom text format...")
 cprint = TextFormatter()
 cprint.cfg('g', 'k', 'b')
@@ -48,7 +67,8 @@ cprint.out("Success!")
 print("Setting csp var")
 csp = dwavebinarycsp.ConstraintSatisfactionProblem(dwavebinarycsp.BINARY)
 print("csp adding constraint")
-csp.add_constraint(logic_circuit, ['a', 'b', 'c', 'd','e','f','g'])
+
+csp.add_constraint(logic_circuit, varNames)
 
 print("converting to bqm")
 print("Started "+str(datetime.now()))
@@ -71,7 +91,12 @@ print("making sampleset")
 print("Started "+str(datetime.now()))
 
 start = time.time()
-samplesize=10
+
+
+
+
+
+
 print("Samplesize is "+str(samplesize))
 sampleset = sampler.sample(bqm, num_reads=samplesize, label='output')
 done = time.time()
@@ -83,7 +108,84 @@ print("<SAMPLESET>\n")
 cprint.cfg('b', 'k', 'b')
 
 cprint.out(sampleset)
+cprint.out(type(sampleset))
 
 print("\n</END OF SAMPLESET>")
 cprint.cfg('b', 'k', 'b')
+
+#for sample, energy in sampleset.data(varNames):
+#    print(sample, csp.check(sample), energy)
+
+
+print("Starting Packing Into CSV")
+valid, invalid, datas = 0, 0, []
+for datum in sampleset.data(['sample', 'energy', 'num_occurrences']):
+    if (csp.check(datum.sample)):
+        valid = valid+datum.num_occurrences
+        for i in range(datum.num_occurrences):
+            datas.append((datum.sample, datum.energy, '1'))
+    else:
+        invalid = invalid+datum.num_occurrences
+        for i in range(datum.num_occurrences):
+            datas.append((datum.sample, datum.energy, '0'))
+print(valid, invalid)
+print(datas)
+print(datas[0][0])
+data=sampleset
+print(data)
+firstLen=len(data)
+i=0
+tableHeaders = []
+def joinaList(list1):
+    j=0
+    outLine=""
+    while j<len(list1):
+        outLine=outLine+str(list1[j])
+        if not (j==(len(list1)-1)):
+            outLine=outLine+","
+        j=j+1
+    j=0
+    return outLine
+def joinBoxes(list1,callable1):
+    j=0
+    outLine=""
+    while j<len(list1):
+        outLine=outLine+str(callable1(list1[j]))
+        if not (j==(len(list1)-1)):
+            outLine=outLine+","
+        j=j+1
+    j=0
+    return outLine
+
+insamples=0
+intable=0
+itemsInTab=[]
+for item in sampleset:
+    intable=intable+1
+    for items in item:
+        insamples=insamples+1
+        break
+    for items in item:
+        itemsInTab.append(items)
+    break
+
+def buildAHeader(inv):
+    outList1=[]
+    h=0
+    while h<intable:
+        d=0
+        while d<insamples:
+            outText="DataSheet"+str(h)+":"+itemsInTab[d]
+            outList1.append(outText)
+            d=d+1
+        h=h+1
+    
+    return joinaList(outList1)
+
+print(buildAHeader(sampleset))
+for item in sampleset:
+    print(item)
+    for items in item:
+        print(items)
+
 cprint.out("Completed "+str(datetime.now()))
