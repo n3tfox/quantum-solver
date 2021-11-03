@@ -136,7 +136,6 @@ for datum in sampleset.data(['sample', 'energy', 'num_occurrences']):
             datas.append((datum.sample, datum.energy, '0'))
 print("valid,invalid",valid, invalid)
 print(datas)
-print(datas[0][0])
 data=sampleset
 print(data)
 firstLen=len(data)
