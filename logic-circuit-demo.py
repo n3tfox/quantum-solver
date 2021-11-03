@@ -30,7 +30,7 @@ print("Staring Program...")
 import dwavebinarycsp
 
 print("Defining vars")
-
+#logic gates varnames
 varNames=['a', 'b', 'y', 'z']
 
 outNames=['a','b','y','z']
@@ -54,6 +54,8 @@ print("Defining Logic Circuit")
 #    num2=num1*num1
 #    output1=num2==49
 #  
+#this is the logic circuit:
+
 def logic_circuit(a,b,y,z):
     and1=a and b
     or1=a or b
@@ -63,6 +65,7 @@ def logic_circuit(a,b,y,z):
     carry1=and1
 
     return ((out1==y) and (carry1==z))
+
 print("Setting up custom text format...")
 cprint = TextFormatter()
 cprint.cfg('g', 'k', 'b')
@@ -178,4 +181,6 @@ fileObject.close()
 
 print("Binary data is found at "+outName+".bin");
 print("Text data is found at "+outName+".txt");
+print("To load bin, use sampleset=pickle.load(fileObject)");
+print("To load text, use text editor.");
 cprint.out("Completed "+str(datetime.now()))
