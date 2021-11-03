@@ -17,6 +17,9 @@ from TextFormatter import TextFormatter
 from datetime import datetime
 import time
 import array as arr
+import json
+import numpy as nmpy
+import pickle
 
 
 
@@ -157,35 +160,22 @@ def joinBoxes(list1,callable1):
     j=0
     return outLine
 
-insamples=0
-intable=0
-itemsInTab=[]
-for item in sampleset:
-    intable=intable+1
-    for items in item:
-        insamples=insamples+1
-        break
-    for items in item:
-        itemsInTab.append(items)
-    break
+print(type(sampleset))
+outName=str(datetime.now()).replace(" ","_")+"-results";
+# Writing to sample.txt
+with open(outName+".txt", "w") as outfile:
+    outfile.write(str(sampleset))
 
-def buildAHeader(inv):
-    outList1=[]
-    h=0
-    while h<intable:
-        d=0
-        while d<insamples:
-            outText="DataSheet"+str(h)+":"+itemsInTab[d]
-            outList1.append(outText)
-            d=d+1
-        h=h+1
-    
-    return joinaList(outList1)
 
-print(buildAHeader(sampleset))
-for item in sampleset:
-    print(item)
-    for items in item:
-        print(items)
+#som = SOM_CLASS()
 
+fileObject = open(outName+".bin", "wb")
+
+pickle.dump(sampleset, fileObject)
+#som = pickle.load(fileObject)
+#som.work()
+fileObject.close()
+
+print("Binary data is found at "+outName+".bin");
+print("Text data is found at "+outName+".txt");
 cprint.out("Completed "+str(datetime.now()))
